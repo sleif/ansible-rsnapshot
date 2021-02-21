@@ -1,0 +1,83 @@
+---
+
+- name: install epel repo on RedHat family
+  package:
+    name: epel-release
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: install packages for rsnapshot
+  package:
+    name: "{{ rsnapshot_packages }}"
+
+- name: "configure: Create directory {{ rsnapshot_snapshot_root }}"
+  file:
+    state: directory
+    path: "{{ rsnapshot_snapshot_root }}"
+    owner: "{{ rsnapshot_snapshot_root_owner }}"
+    group: "{{ rsnapshot_snapshot_root_group }}"
+    mode: "{{ rsnapshot_snapshot_root_mode }}"
+
+- name: create_and_register_public_keys.yml
+  include_tasks: create_and_register_public_keys.yml
+  vars:
+    target_host: "{{ item.backup_host }}"
+    proxyjump: "{{ item.proxyjump }}"
+    proxyjump_target: "{{ item.proxyjump_target }}"
+  loop: "{{ rsnapshot_backup_points }}"
+  loop_control:
+    label: "{{ item.target_dir }}"
+  when:
+    - item.backup_host > ""
+  tags:
+    ssh_key_files
+
+- name: "configure: Create configuration {{ rsnapshot_config_file }}"
+  template:
+    src: "rsnapshot.conf.j2"
+    dest: "{{ rsnapshot_config_file }}"
+    owner: "{{ rsnapshot_config_file_owner }}"
+    group: "{{ rsnapshot_config_file_group }}"
+    mode: "{{ rsnapshot_config_file_mode }}"
+    backup: "{{ rsnapshot_backup_conf }}"
+    validate: "rsnapshot -c %s configtest"
+  tags:
+    - rsnapshot_config_file
+
+- name: Add cronjob for rsnapshot hourly
+  cron:
+    name: "rsnapshot hourly"
+    minute: "44"
+    hour: "*/4"
+    job: "/usr/bin/rsnapshot sync && /usr/bin/rsnapshot hourly"
+  tags:
+    - rsnapshot_cronjobs
+
+- name: Add cronjob for rsnapshot daily
+  cron:
+    name: "rsnapshot daily"
+    minute: "33"
+    hour: "0"
+    job: "/usr/bin/rsnapshot daily"
+  tags:
+    - rsnapshot_cronjobs
+
+- name: Add cronjob for rsnapshot weekly
+  cron:
+    name: "rsnapshot weekly"
+    minute: "22"
+    hour: "0"
+    weekday: "6"
+    job: "/usr/bin/rsnapshot weekly"
+  tags:
+    - rsnapshot_cronjobs
+
+- name: Add cronjob for rsnapshot monthly
+  cron:
+    name: "rsnapshot monthly"
+    minute: "11"
+    hour: "0"
+    day: "1"
+    job: "/usr/bin/rsnapshot monthly"
+  tags:
+    - rsnapshot_cronjobs
