@@ -1,0 +1,54 @@
+---
+
+rsnapshot_packages:
+  - rsnapshot
+
+# private_key_file: '/root/.ssh/id_rsa_{{ sync_source_host | regex_replace("\.", "_") }}_{{ sync_source | regex_replace("[/\.]", "_") }}'
+# public_key_file: '{{ private_key_file }}.pub'
+# sync_command: "scp -B -p -q -i {{ private_key_file | quote }} -r {{ sync_source_host | quote }}:{{ sync_source | quote }} {{ sync_target_dir | quote }}"
+# sync_target: "{{ sync_target_dir }}/{{ sync_source | basename }}"
+
+### BACKUP POINTS / SCRIPTS ###
+rsnapshot_backup_points: []
+#  - { dir: "/",      host: "localhost/", options: "onefs=1" }
+#  - { dir: "/boot/", host: "localhost/", options: "onefs=1" }
+
+rsnapshot_exclude: []
+#  - { regex: ".git/" }
+
+# GLOBAL OPTIONS
+rsnapshot_snapshot_root: /.snapshots
+
+rsnapshot_snapshot_root_owner: "root"
+rsnapshot_snapshot_root_group: "root"
+rsnapshot_snapshot_root_mode: "0700"
+
+rsnapshot_no_create_root: "1"
+
+rsnapshot_retain_hourly: "6"
+rsnapshot_retain_daily: "7"
+rsnapshot_retain_weekly: "4"
+rsnapshot_retain_monthly: "3"
+
+rsnapshot_config_version: "1.2"
+rsnapshot_verbose: "2"
+rsnapshot_loglevel: "3"
+rsnapshot_logfile: "/var/log/rsnapshot"
+rsnapshot_lockfile: "/var/run/rsnapshot.pid"
+
+rsnapshot_link_dest: "1"
+
+rsnapshot_config_file: "/etc/rsnapshot.conf"
+rsnapshot_config_file_test: "/etc/rsnapshot-test.conf"
+rsnapshot_config_file_owner: "root"
+rsnapshot_config_file_group: "root"
+rsnapshot_config_file_mode: "0640"
+
+rsnapshot_backup_conf: yes
+
+rsnapshot_cmd_cp: "/usr/bin/cp"
+rsnapshot_cmd_rm: "/usr/bin/rm"
+rsnapshot_cmd_rsync: "/usr/bin/rsync"
+rsnapshot_cmd_ssh: "/usr/bin/ssh"
+rsnapshot_cmd_logger: "/usr/bin/logger"
+rsnapshot_cmd_du: "/usr/bin/du"

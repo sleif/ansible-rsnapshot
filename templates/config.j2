@@ -1,0 +1,5 @@
+Host *
+    IdentityFile {{ ssh_key_file }}
+Host {{ target_host }}
+    Hostname  {{ proxyjump_target }}
+    ProxyJump   root@{{ proxyjump }}

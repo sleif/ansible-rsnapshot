@@ -1,0 +1,59 @@
+---
+- name: set ssh_key_file fact
+  set_fact:
+    ssh_key_file: '/root/.ssh/id_rsa_rsnapshot_{{ target_host | regex_replace("\.", "_") }}'
+  tags:
+    ssh_key_files
+
+- name: set ssh_config_file fact
+  set_fact:
+    ssh_config_file: '/root/.ssh/config_{{ target_host | regex_replace("\.", "_") }}'
+  tags:
+    ssh_key_files
+
+- name: "{{ ssh_key_file }}"
+  command: "ssh-keygen -b 4096 -t rsa -N '' -f '{{ ssh_key_file |quote }}'"
+  args:
+    creates: "{{ ssh_key_file }}"
+  tags:
+    ssh_key_files
+
+- name: Register public key
+  command: "cat {{ ssh_key_file | quote }}.pub"
+  register: public_key
+  changed_when: false
+  tags:
+    ssh_key_files
+
+- name: "Allow {{ ssh_key_file }}.pub to access target host {{ target_host }}"
+  authorized_key:
+    user: root
+    key: "{{ public_key.stdout }}"
+    # The scp options allowed in the regex have been determined by using "scp -v"
+    key_options: 'command="if [[ \"$SSH_ORIGINAL_COMMAND\" =~
+      ^rsync[[:space:]]--server[[:space:]]--sender[[:space:]].*--numeric-ids[[:space:]]\.[[:space:]].*$ ]];
+      then $SSH_ORIGINAL_COMMAND ; else echo ERROR Access Denied; fi",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding'
+  delegate_to: "{{ target_host }}"
+  tags:
+    ssh_key_files
+
+- name: "Allow {{ ssh_key_file }}.pub to access proxyjump host {{ target_host }}"
+  authorized_key:
+    user: root
+    key: "{{ public_key.stdout }}"
+    key_options: 'command="if [[ \"$SSH_ORIGINAL_COMMAND\" =~
+      ^rsync[[:space:]]--server[[:space:]]--sender[[:space:]].*--numeric-ids[[:space:]]\.[[:space:]].*$ ]];
+      then $SSH_ORIGINAL_COMMAND ; else echo ERROR Access Denied; fi",no-pty,no-agent-forwarding,no-X11-forwarding'
+  delegate_to: "{{ proxyjump }}"
+  tags:
+    ssh_key_files
+
+- name: "create specific ssh config file {{ ssh_config_file }}"
+  template:
+    src: config.j2
+    dest: "{{ ssh_config_file }}"
+    owner: "{{ rsnapshot_config_file_owner }}"
+    group: "{{ rsnapshot_config_file_group }}"
+    mode: "{{ rsnapshot_config_file_mode }}"
+  tags:
+    ssh_key_files
