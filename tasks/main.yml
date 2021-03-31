@@ -1,17 +1,17 @@
 ---
 
 - name: install epel repo on RedHat family
-  package:
+  ansible.builtin.package:
     name: epel-release
   when:
     - ansible_os_family == "RedHat"
 
 - name: install packages for rsnapshot
-  package:
+  ansible.builtin.package:
     name: "{{ rsnapshot_packages }}"
 
 - name: "configure: Create directory {{ rsnapshot_snapshot_root }}"
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ rsnapshot_snapshot_root }}"
     owner: "{{ rsnapshot_snapshot_root_owner }}"
@@ -19,7 +19,7 @@
     mode: "{{ rsnapshot_snapshot_root_mode }}"
 
 - name: create_and_register_public_keys.yml
-  include_tasks: create_and_register_public_keys.yml
+  ansible.builtin.include_tasks: create_and_register_public_keys.yml
   vars:
     target_host: "{{ item.backup_host }}"
     proxyjump: "{{ item.proxyjump }}"
@@ -33,7 +33,7 @@
     ssh_key_files
 
 - name: "configure: Create configuration {{ rsnapshot_config_file }}"
-  template:
+  ansible.builtin.template:
     src: "rsnapshot.conf.j2"
     dest: "{{ rsnapshot_config_file }}"
     owner: "{{ rsnapshot_config_file_owner }}"
@@ -45,7 +45,7 @@
     - rsnapshot_config_file
 
 - name: Add cronjob for rsnapshot hourly
-  cron:
+  ansible.builtin.cron:
     name: "rsnapshot hourly"
     minute: "44"
     hour: "*/4"
@@ -54,7 +54,7 @@
     - rsnapshot_cronjobs
 
 - name: Add cronjob for rsnapshot daily
-  cron:
+  ansible.builtin.cron:
     name: "rsnapshot daily"
     minute: "33"
     hour: "0"
@@ -63,7 +63,7 @@
     - rsnapshot_cronjobs
 
 - name: Add cronjob for rsnapshot weekly
-  cron:
+  ansible.builtin.cron:
     name: "rsnapshot weekly"
     minute: "22"
     hour: "0"
@@ -73,7 +73,7 @@
     - rsnapshot_cronjobs
 
 - name: Add cronjob for rsnapshot monthly
-  cron:
+  ansible.builtin.cron:
     name: "rsnapshot monthly"
     minute: "11"
     hour: "0"
