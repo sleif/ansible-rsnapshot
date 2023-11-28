@@ -44,7 +44,7 @@ rsnapshot_config_file_owner: "root"
 rsnapshot_config_file_group: "root"
 rsnapshot_config_file_mode: "0640"
 
-rsnapshot_backup_conf: yes
+rsnapshot_backup_conf: true
 
 rsnapshot_cmd_cp: "/usr/bin/cp"
 rsnapshot_cmd_rm: "/usr/bin/rm"

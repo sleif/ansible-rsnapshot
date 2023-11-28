@@ -12,7 +12,7 @@
     ssh_key_files
 
 - name: "{{ ssh_key_file }}"
-  ansible.builtin.command: "ssh-keygen -b 4096 -t rsa -N '' -f '{{ ssh_key_file |quote }}'"
+  ansible.builtin.command: "ssh-keygen -b 4096 -t rsa -N '' -f '{{ ssh_key_file | quote }}'"
   args:
     creates: "{{ ssh_key_file }}"
   tags:
