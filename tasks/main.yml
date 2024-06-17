@@ -5,10 +5,12 @@
     name: epel-release
   when:
     - ansible_os_family == "RedHat"
+  ignore_errors: true  # noqa: ignore-errors
 
 - name: install packages for rsnapshot
   ansible.builtin.package:
     name: "{{ rsnapshot_packages }}"
+    enablerepo: epel
 
 - name: "configure: Create directory {{ rsnapshot_snapshot_root }}"
   ansible.builtin.file:

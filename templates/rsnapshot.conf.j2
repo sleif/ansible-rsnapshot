@@ -53,7 +53,7 @@ sync_first	1
 
 ### BACKUP POINTS/SCRIPTS
 {% for item  in rsnapshot_backup_points %}
-backup	{% if item.backup_host is ne "" %}root@{{ item.backup_host }}:{% endif %}{{ item.dir }}	{{ item.target_dir }}	{% if item.proxyjump is ne "" %}ssh_args=-4 -F /root/.ssh/config_{{ item.backup_host }},{% endif %}{{ item.options }}
+backup	{% if item.backup_host is ne "" %}root@{{ item.backup_host }}:{% endif %}{{ item.dir }}	{{ item.target_dir }}	{% if item.backup_host is ne "" %}ssh_args=-4 -F /root/.ssh/config_{{ item.backup_host }},{% endif %}{{ item.options }}
 {% endfor %}
 
 ### EXCLUDE

@@ -44,7 +44,9 @@
     key_options: 'command="if [[ \"$SSH_ORIGINAL_COMMAND\" =~
       ^rsync[[:space:]]--server[[:space:]]--sender[[:space:]].*--numeric-ids[[:space:]]\.[[:space:]].*$ ]];
       then $SSH_ORIGINAL_COMMAND ; else echo ERROR Access Denied; fi",no-pty,no-agent-forwarding,no-X11-forwarding'
-  delegate_to: "{{ proxyjump }}"
+  delegate_to: "{{ proxyjump if proxyjump is truthy else omit }}"
+  when:
+    - proxyjump is truthy
   tags:
     ssh_key_files
 
