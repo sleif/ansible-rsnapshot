@@ -1,7 +1,7 @@
 ---
 - name: set ssh_key_file fact
   ansible.builtin.set_fact:
-    ssh_key_file: '/root/.ssh/id_rsa_rsnapshot_{{ target_host | regex_replace("\.", "_") }}'
+    ssh_key_file: '/root/.ssh/id_ed25519_rsnapshot_{{ target_host | regex_replace("\.", "_") }}'
   tags:
     ssh_key_files
 
@@ -12,7 +12,7 @@
     ssh_key_files
 
 - name: "{{ ssh_key_file }}"
-  ansible.builtin.command: "ssh-keygen -b 4096 -t rsa -N '' -f '{{ ssh_key_file | quote }}'"
+  ansible.builtin.command: "ssh-keygen -b 4096 -t ed25519 -N '' -f '{{ ssh_key_file | quote }}'"
   args:
     creates: "{{ ssh_key_file }}"
   tags:
