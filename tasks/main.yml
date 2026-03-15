@@ -4,7 +4,7 @@
   ansible.builtin.package:
     name: epel-release
   when:
-    - ansible_os_family == "RedHat"
+    - ansible_facts.os_family == "RedHat"
   ignore_errors: true  # noqa: ignore-errors
 
 - name: install packages for rsnapshot
