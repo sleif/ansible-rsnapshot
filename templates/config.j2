@@ -1,7 +1,9 @@
 Host *
     IdentityFile {{ ssh_key_file }}
-{% if proxyjump is truthy %}
+{% if proxyjump_target is truthy %}
 Host {{ target_host }}
     Hostname  {{ proxyjump_target }}
+{% if proxyjump is truthy %}
     ProxyJump   root@{{ proxyjump }}
+{% endif %}
 {% endif %}
